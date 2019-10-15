@@ -10,7 +10,7 @@ jobs:
         Configuration: 'Debug'
       Release:
         Configuration: 'Release'
-  maxParallel: 2
+    maxParallel: 2
   pool:
     vmImage: 'ubuntu-latest'
   steps:
