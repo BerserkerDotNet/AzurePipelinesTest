@@ -1,0 +1,21 @@
+  
+trigger:
+- master
+
+jobs:
+- job: Build
+  strategy:
+    matrix:
+      Debug:
+        Configuration: 'Debug'
+      Release:
+        Configuration: 'Release'
+  maxParallel: 2
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: PowerShell@2
+    displayName: 'Build'
+    inputs:
+      filePath: 'build.ps1'
+      arguments: '$(Configuration)'
