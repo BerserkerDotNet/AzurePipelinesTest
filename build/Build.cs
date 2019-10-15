@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Nuke.Common;
+using Nuke.Common.CI;
 using Nuke.Common.Execution;
 using Nuke.Common.Git;
 using Nuke.Common.ProjectModel;
@@ -22,7 +23,7 @@ class Build : NukeBuild
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
 
-    public static int Main () => Execute<Build>(x => x.Compile);
+    public static int Main() => Execute<Build>(x => x.Test);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -52,5 +53,20 @@ class Build : NukeBuild
                 .SetConfiguration(Configuration)
                 .EnableNoRestore());
         });
+
+    [Partition(2)] readonly Partition TestPartition;
+    Target Test => _ => _
+    .DependsOn(Compile)
+    .Partition(() => TestPartition)
+    .Executes(() =>
+    {
+        Console.WriteLine($"{TestPartition.IsIn(1)}; {TestPartition.IsIn(2)}");
+        DotNetTest(s => s
+            .SetConfiguration(Configuration)
+            .ResetVerbosity()
+            .CombineWith(
+                TestPartition.GetCurrent(Solution.GetProjects("*.Tests")), (cs, v) => cs
+                    .SetProjectFile(v)));
+    });
 
 }
