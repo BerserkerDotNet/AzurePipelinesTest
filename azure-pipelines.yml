@@ -18,4 +18,4 @@ jobs:
     displayName: 'Build'
     inputs:
       filePath: 'build.ps1'
-      arguments: '$(Configuration)'
+      arguments: '-configuration $(Configuration)'
