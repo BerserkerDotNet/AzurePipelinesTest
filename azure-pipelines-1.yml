@@ -1,0 +1,15 @@
+trigger:
+- master
+
+jobs:
+- job: Build
+  strategy:
+    parallel: 2
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: PowerShell@2
+    displayName: 'Build'
+    inputs:
+      filePath: 'build.ps1'
+      arguments: '-configuration $(Configuration)'
