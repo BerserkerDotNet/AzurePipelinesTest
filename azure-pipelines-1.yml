@@ -1,16 +1,10 @@
-  
 trigger:
 - master
 
 jobs:
 - job: Build
   strategy:
-    matrix:
-      Debug:
-        Configuration: 'Debug'
-      Release:
-        Configuration: 'Release'
-    maxParallel: 2
+    parallel: 2
   pool:
     vmImage: 'ubuntu-latest'
   steps:
