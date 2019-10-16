@@ -21,6 +21,9 @@ jobs:
       filePath: 'build.ps1'
       arguments: 'Test --partition-Test 2/2'
 - job: Test
+  dependsOn:
+  - Test01
+  - Test02
   pool:
     vmImage: 'ubuntu-latest'
   steps:
