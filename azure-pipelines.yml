@@ -1,16 +1,8 @@
-  
 trigger:
 - master
 
 jobs:
-- job: Build
-  strategy:
-    matrix:
-      Debug:
-        Configuration: 'Debug'
-      Release:
-        Configuration: 'Release'
-    maxParallel: 2
+- job: Test01
   pool:
     vmImage: 'ubuntu-latest'
   steps:
@@ -18,4 +10,18 @@ jobs:
     displayName: 'Build'
     inputs:
       filePath: 'build.ps1'
-      arguments: '-configuration $(Configuration)'
+      arguments: 'Test --partition-Test 1/2'
+- job: Test02
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: PowerShell@2
+    displayName: 'Build'
+    inputs:
+      filePath: 'build.ps1'
+      arguments: 'Test --partition-Test 2/2'
+- job: Test
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - script: echo After all partitions
