@@ -2,9 +2,7 @@ trigger:
 - master
 
 jobs:
-- job: Test
-  strategy:
-    parallel: 2
+- job: Build
   pool:
     vmImage: 'ubuntu-latest'
   steps:
@@ -12,7 +10,27 @@ jobs:
     displayName: 'Build'
     inputs:
       filePath: 'build.ps1'
-      arguments: 'Test --partition-Test $(System.JobPositionInPhase)/$(System.TotalJobsInPhase)'
+      arguments: 'Compile'
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: '$(System.DefaultWorkingDirectory)'
+      artifactName: BuildResult
+- job: Test
+  strategy:
+    parallel: 2
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: DownloadBuildArtifacts@0
+    displayName: 'Download Build Artifacts'
+    inputs:
+      artifactName: BuildResult
+      downloadPath: $(System.DefaultWorkingDirectory)
+  - task: PowerShell@2
+    displayName: 'Test'
+    inputs:
+      filePath: 'build.ps1'
+      arguments: 'Test --skip --partition-Test $(System.JobPositionInPhase)/$(System.TotalJobsInPhase)'
 - job: Package
   dependsOn:
   - Test
