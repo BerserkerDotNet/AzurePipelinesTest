@@ -2,28 +2,20 @@ trigger:
 - master
 
 jobs:
-- job: Test01
-  pool:
-    vmImage: 'ubuntu-latest'
-  steps:
-  - task: PowerShell@2
-    displayName: 'Build'
-    inputs:
-      filePath: 'build.ps1'
-      arguments: 'Test --partition-Test 1/2'
-- job: Test02
-  pool:
-    vmImage: 'ubuntu-latest'
-  steps:
-  - task: PowerShell@2
-    displayName: 'Build'
-    inputs:
-      filePath: 'build.ps1'
-      arguments: 'Test --partition-Test 2/2'
 - job: Test
+  strategy:
+    parallel: 2
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: PowerShell@2
+    displayName: 'Build'
+    inputs:
+      filePath: 'build.ps1'
+      arguments: 'Test --partition-Test $(System.JobPositionInPhase)/$(System.TotalJobsInPhase)'
+- job: Package
   dependsOn:
-  - Test01
-  - Test02
+  - Test
   pool:
     vmImage: 'ubuntu-latest'
   steps:
