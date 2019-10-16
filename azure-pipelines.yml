@@ -16,6 +16,7 @@ jobs:
       pathtoPublish: '$(System.DefaultWorkingDirectory)'
       artifactName: BuildResult
 - job: Test
+  dependsOn: Build
   strategy:
     parallel: 2
   pool:
