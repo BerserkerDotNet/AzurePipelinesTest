@@ -12,10 +12,10 @@ jobs:
     inputs:
       filePath: 'build.ps1'
       arguments: 'Compile'
-  - task: PublishBuildArtifacts@1
+  - task: PublishPipelineArtifact@1
     inputs:
-      pathtoPublish: '$(System.DefaultWorkingDirectory)'
-      artifactName: BuildResult
+      path: $(System.DefaultWorkingDirectory)
+      artifact: BuildResult
 # This job depends on the "Build job"
 # It downloads artifacts from "BuildResult" and runs two instances of the job in parallel.
 # Number of parallel instances are configured strategy: parallel: X, where X is the number of parallel jobs to run.
@@ -27,11 +27,11 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   steps:
-  - task: DownloadBuildArtifacts@0
-    displayName: 'Download Build Artifacts'
+  - task: DownloadPipelineArtifact@2
+    displayName: 'Download Artifacts'
     inputs:
       artifactName: BuildResult
-      downloadPath: $(System.DefaultWorkingDirectory)
+      targetPath: $(System.DefaultWorkingDirectory)
   - task: PowerShell@2
     displayName: 'Test'
     inputs:
