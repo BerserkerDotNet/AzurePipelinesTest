@@ -2,6 +2,7 @@ trigger:
 - master
 
 jobs:
+# This job build the app and packages it to artifacts with name "BuildResult"
 - job: Build
   pool:
     vmImage: 'ubuntu-latest'
@@ -15,6 +16,10 @@ jobs:
     inputs:
       pathtoPublish: '$(System.DefaultWorkingDirectory)'
       artifactName: BuildResult
+# This job depends on the "Build job"
+# It downloads artifacts from "BuildResult" and runs two instances of the job in parallel.
+# Number of parallel instances are configured strategy: parallel: X, where X is the number of parallel jobs to run.
+# We have access to what the current job number is and the total number of jobs through System.JobPositionInPhase and System.TotalJobsInPhase variables respectively.
 - job: Test
   dependsOn: Build
   strategy:
@@ -32,6 +37,7 @@ jobs:
     inputs:
       filePath: 'build.ps1'
       arguments: 'Test --skip --partition-Test $(System.JobPositionInPhase)/$(System.TotalJobsInPhase)'
+# This job depends on the Test job and it is here to demostrate waiting on parallel jobs.
 - job: Package
   dependsOn:
   - Test
